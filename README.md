@@ -74,3 +74,36 @@ Open `http://localhost:3000` in your web browser.
 ## 🛡️ Security Best Practices
 * Sensitive credentials and API keys have been moved into `.env` (which is excluded from Git tracking).
 * Firebase JSON configuration files are ignored by Git. Always reference credentials via `import.meta.env` in client code and `process.env` in server code.
+
+---
+
+## ☁️ Vercel Deployment
+
+This project is optimized to run as a single Vercel Serverless function proxying the Express backend, alongside the statically served Vite frontend.
+
+### Steps to Deploy to Vercel:
+
+1. **Install Vercel CLI (Optional):**
+   ```bash
+   npm i -g vercel
+   ```
+2. **Link and Deploy:**
+   Run `vercel` from the root of the project to link your project and initiate a preview build:
+   ```bash
+   vercel
+   ```
+3. **Configure Environment Variables:**
+   Add the following environment variables in your **Vercel Project Dashboard** (under Settings > Environment Variables):
+   * `GEMINI_API_KEY`
+   * `VITE_FIREBASE_API_KEY`
+   * `VITE_FIREBASE_AUTH_DOMAIN`
+   * `VITE_FIREBASE_PROJECT_ID`
+   * `VITE_FIREBASE_STORAGE_BUCKET`
+   * `VITE_FIREBASE_MESSAGING_SENDER_ID`
+   * `VITE_FIREBASE_APP_ID`
+   * `VITE_FIREBASE_MEASUREMENT_ID`
+4. **Deploy to Production:**
+   Run `vercel --prod` to deploy to production:
+   ```bash
+   vercel --prod
+   ```
