@@ -20,7 +20,16 @@ import {
   query,
   orderBy
 } from "firebase/firestore";
-import firebaseConfig from "../../firebase-applet-config.json";
+// Initialize Firebase configuration from environment variables
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || ""
+};
 
 // Initialize Firebase App
 const app = initializeApp(firebaseConfig);
@@ -37,16 +46,24 @@ provider.addScope("https://www.googleapis.com/auth/gmail.readonly");
 let isSigningIn = false;
 let cachedAccessToken: string | null = null;
 
+// Helper to prevent Firestore calls from hanging indefinitely when database is not configured
+const withTimeout = <T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> => {
+  return Promise.race([
+    promise,
+    new Promise<T>((resolve) => setTimeout(() => resolve(fallback), timeoutMs))
+  ]);
+};
+
 // Save or Update User Profile Document in Firestore
 export const saveUserProfile = async (uid: string, email: string, displayName?: string) => {
   try {
     const docRef = doc(db, "users", uid);
-    await setDoc(docRef, {
+    await withTimeout(setDoc(docRef, {
       uid,
       email,
       displayName: displayName || email.split("@")[0],
       createdAt: new Date().toISOString()
-    }, { merge: true });
+    }, { merge: true }), 3000, null);
     console.log("User Profile saved to Firestore successfully:", uid);
   } catch (error) {
     console.error("Error saving user profile to Firestore:", error);
@@ -142,7 +159,7 @@ export const savePlanToFirestore = async (userId: string, plan: any) => {
       escalationStrategy: plan.escalationStrategy,
       createdAt: new Date().toISOString()
     };
-    await setDoc(docRef, payload);
+    await withTimeout(setDoc(docRef, payload), 3000, null);
     console.log("Successfully saved plan to Firestore:", planId);
   } catch (error) {
     console.error("Error saving plan to Firestore:", error);
@@ -154,7 +171,11 @@ export const getPlansFromFirestore = async (userId: string): Promise<any[]> => {
   try {
     const collRef = collection(db, "users", userId, "plans");
     const q = query(collRef, orderBy("createdAt", "desc"));
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await withTimeout(getDocs(q), 3000, null);
+    if (!querySnapshot) {
+      console.warn("Firestore getPlans query timed out. Using local fallback.");
+      return [];
+    }
     const plans: any[] = [];
     querySnapshot.forEach((doc) => {
       plans.push(doc.data());
@@ -170,7 +191,7 @@ export const getPlansFromFirestore = async (userId: string): Promise<any[]> => {
 export const deletePlanFromFirestore = async (userId: string, planId: string) => {
   try {
     const docRef = doc(db, "users", userId, "plans", planId);
-    await deleteDoc(docRef);
+    await withTimeout(deleteDoc(docRef), 3000, null);
     console.log("Successfully deleted plan from Firestore:", planId);
   } catch (error) {
     console.error("Error deleting plan from Firestore:", error);
@@ -194,7 +215,7 @@ export const saveScanToFirestore = async (userId: string, scan: any, inputFeed: 
       proposedFocusBlocks: scan.proposedFocusBlocks,
       createdAt: new Date().toISOString()
     };
-    await setDoc(docRef, payload);
+    await withTimeout(setDoc(docRef, payload), 3000, null);
     console.log("Successfully saved scan to Firestore:", scanId);
   } catch (error) {
     console.error("Error saving scan to Firestore:", error);
@@ -206,7 +227,11 @@ export const getScansFromFirestore = async (userId: string): Promise<any[]> => {
   try {
     const collRef = collection(db, "users", userId, "guardian_scans");
     const q = query(collRef, orderBy("createdAt", "desc"));
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await withTimeout(getDocs(q), 3000, null);
+    if (!querySnapshot) {
+      console.warn("Firestore getScans query timed out. Using local fallback.");
+      return [];
+    }
     const scans: any[] = [];
     querySnapshot.forEach((doc) => {
       scans.push(doc.data());

@@ -110,7 +110,9 @@ app.get("/api/google/gmail", async (req, res) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!listRes.ok) {
-      throw new Error(`Gmail API list failed: ${listRes.statusText}`);
+      const errText = await listRes.text();
+      console.error(`Gmail API Error: ${listRes.statusText} - Details:`, errText);
+      throw new Error(`Gmail API list failed: ${listRes.statusText}. Details: ${errText}`);
     }
     const listData: any = await listRes.json();
     const messages = listData.messages || [];
@@ -165,7 +167,9 @@ app.get("/api/google/calendar", async (req, res) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!calRes.ok) {
-      throw new Error(`Calendar API list failed: ${calRes.statusText}`);
+      const errText = await calRes.text();
+      console.error(`Calendar API Error: ${calRes.statusText} - Details:`, errText);
+      throw new Error(`Calendar API list failed: ${calRes.statusText}. Details: ${errText}`);
     }
     const calData: any = await calRes.json();
     const events = calData.items || [];
