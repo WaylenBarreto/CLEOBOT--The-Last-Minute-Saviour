@@ -1,0 +1,8 @@
+{
+  "name": "The Last-Minute Life Saver",
+  "description": "An agentic AI productivity companion that transforms messy, raw, or high-level last-minute tasks into prioritized, structured plans with autonomous agent micro-steps.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Syne:wght@700;800&family=Space+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Syne", "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Custom Neo-Brutalist shadow styling with friendly rounded corners */
+.neo-border {
+  border: 2px solid #18181b;
+  border-radius: 16px;
+}
+
+.neo-border-sm {
+  border: 1.5px solid #18181b;
+  border-radius: 8px;
+}
+
+.neo-shadow {
+  box-shadow: 3px 3px 0px 0px #18181b;
+  border-radius: 16px;
+}
+
+.neo-shadow-lg {
+  box-shadow: 5px 5px 0px 0px #18181b;
+  border-radius: 16px;
+}
+
+.neo-shadow-rose {
+  box-shadow: 4px 4px 0px 0px #FF4A8D;
+  border: 2px solid #18181b;
+  border-radius: 12px;
+}
+
+/* Tactile shift on active/hover */
+.neo-button-hover {
+  transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.neo-button-hover:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+
+.neo-button-hover:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.6; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+

@@ -1,0 +1,65 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User account info and profile settings",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "email"]
+    },
+    "TaskPlan": {
+      "title": "Crisis Game Plan",
+      "description": "A saved crisis mitigation and defense timeline",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "targetDeadline": { "type": "string" },
+        "simulatedTime": { "type": "string" },
+        "checkpoints": { "type": "array" },
+        "mitigationSteps": { "type": "array" },
+        "escalationContact": { "type": "string" },
+        "escalationCallScript": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "targetDeadline", "simulatedTime", "checkpoints", "mitigationSteps", "createdAt"]
+    },
+    "GuardianScan": {
+      "title": "Guardian Scan History",
+      "description": "A scanned background data feed report",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "streamInput": { "type": "string" },
+        "clientTime": { "type": "string" },
+        "modeDetected": { "type": "string" },
+        "panicModeTrigger": { "type": "boolean" },
+        "escalationTwiMLScript": { "type": "string" },
+        "discoveredDeadlines": { "type": "array" },
+        "proposedFocusBlocks": { "type": "array" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "streamInput", "clientTime", "modeDetected", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User accounts"
+    },
+    "/users/{userId}/plans/{planId}": {
+      "schema": "TaskPlan",
+      "description": "Crisis plan histories segment by user"
+    },
+    "/users/{userId}/guardian_scans/{scanId}": {
+      "schema": "GuardianScan",
+      "description": "Guardian scan reports segment by user"
+    }
+  }
+}
