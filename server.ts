@@ -12,6 +12,33 @@ const PORT = 3000;
 
 app.use(express.json());
 
+function parseJsonObjectFromModelText<T>(text: string, context: string): T {
+  const trimmed = text.trim();
+  const withoutFence = trimmed
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+
+  try {
+    return JSON.parse(withoutFence) as T;
+  } catch (initialError) {
+    const firstBrace = withoutFence.indexOf("{");
+    const lastBrace = withoutFence.lastIndexOf("}");
+
+    if (firstBrace !== -1 && lastBrace > firstBrace) {
+      const jsonSlice = withoutFence.slice(firstBrace, lastBrace + 1);
+      try {
+        return JSON.parse(jsonSlice) as T;
+      } catch {
+        // Fall through to the clearer context-specific error below.
+      }
+    }
+
+    console.error(`[Gemini SDK] ${context} returned invalid JSON:`, text);
+    throw new Error(`${context} returned invalid JSON. Please retry the request.`);
+  }
+}
+
 // Lazy-loaded Gemini Client
 let aiInstance: GoogleGenAI | null = null;
 function getGeminiClient(): GoogleGenAI {
@@ -325,7 +352,7 @@ ${taskInput}
       throw new Error("Received empty response from Gemini.");
     }
 
-    res.json(JSON.parse(resultText));
+    res.json(parseJsonObjectFromModelText(resultText, "Gemini task planner"));
   } catch (error: any) {
     console.error("Error in /api/analyze-task:", error);
     res.status(500).json({ error: error.message || "An unexpected error occurred." });
@@ -498,7 +525,7 @@ ${streamInput}
       throw new Error("Received empty response from Gemini Guardian Engine.");
     }
 
-    res.json(JSON.parse(resultText));
+    res.json(parseJsonObjectFromModelText(resultText, "Gemini Guardian Engine"));
   } catch (error: any) {
     console.error("Error in /api/guardian-analyze:", error);
     res.status(500).json({ error: error.message || "An unexpected error occurred." });

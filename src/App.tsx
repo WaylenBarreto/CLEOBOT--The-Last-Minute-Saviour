@@ -65,6 +65,24 @@ const STRESS_PHRASES = [
   "PREPARING COFFEE-FUELED AGENT BOTS..."
 ];
 
+async function parseApiResponse<T>(response: Response): Promise<T> {
+  const contentType = response.headers.get("content-type") || "";
+
+  if (contentType.includes("application/json")) {
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data?.error || data?.message || `Request failed with status ${response.status}.`);
+    }
+    return data as T;
+  }
+
+  const text = await response.text();
+  const fallbackMessage = response.ok
+    ? "The server returned a non-JSON response."
+    : `Request failed with status ${response.status}.`;
+  throw new Error(text.trim() || fallbackMessage);
+}
+
 const GUARDIAN_PRESETS = [
   {
     title: "Mode A: Harvest (Emails)",
@@ -188,12 +206,7 @@ export default function App() {
         }),
       });
 
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.error || "Failed to analyze background stream.");
-      }
-
-      const data = await response.json();
+      const data = await parseApiResponse<any>(response);
       setGuardianResult(data);
 
       if (user) {
@@ -242,10 +255,7 @@ export default function App() {
           const retryRes = await fetch("/api/google/gmail", {
             headers: { Authorization: `Bearer ${currentToken}` },
           });
-          if (!retryRes.ok) {
-            throw new Error("Failed to load Gmail messages. Check your Google Workspace authorization.");
-          }
-          const retryData = await retryRes.json();
+          const retryData = await parseApiResponse<any>(retryRes);
           setGuardianInput(retryData.formattedText);
           if (autoAnalyze) {
             await triggerDirectAnalyze(retryData.formattedText);
@@ -254,7 +264,7 @@ export default function App() {
         }
         throw new Error("Failed to load Gmail messages. Check your Google Workspace authorization.");
       }
-      const data = await res.json();
+      const data = await parseApiResponse<any>(res);
       setGuardianInput(data.formattedText);
       if (autoAnalyze) {
         await triggerDirectAnalyze(data.formattedText);
@@ -300,10 +310,7 @@ export default function App() {
           const retryRes = await fetch("/api/google/calendar", {
             headers: { Authorization: `Bearer ${currentToken}` },
           });
-          if (!retryRes.ok) {
-            throw new Error("Failed to load Google Calendar. Check your Google Workspace authorization.");
-          }
-          const retryData = await retryRes.json();
+          const retryData = await parseApiResponse<any>(retryRes);
           setGuardianInput(retryData.formattedText);
           if (autoAnalyze) {
             await triggerDirectAnalyze(retryData.formattedText);
@@ -312,7 +319,7 @@ export default function App() {
         }
         throw new Error("Failed to load Google Calendar. Check your Google Workspace authorization.");
       }
-      const data = await res.json();
+      const data = await parseApiResponse<any>(res);
       setGuardianInput(data.formattedText);
       if (autoAnalyze) {
         await triggerDirectAnalyze(data.formattedText);
@@ -364,12 +371,7 @@ export default function App() {
         }),
       });
 
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.error || "Failed to analyze background stream.");
-      }
-
-      const data = await response.json();
+      const data = await parseApiResponse<any>(response);
       setGuardianResult(data);
 
       // Save scan to Firestore if user is authenticated
@@ -496,12 +498,7 @@ export default function App() {
         }),
       });
 
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.error || "Failed to analyze task.");
-      }
-
-      const plan: TaskPlan = await response.json();
+      const plan = await parseApiResponse<TaskPlan>(response);
 
       // Initialize completed state and flags
       plan.actionableSteps = plan.actionableSteps.map(step => ({
@@ -555,12 +552,7 @@ export default function App() {
         }),
       });
 
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.error || "Failed to execute step.");
-      }
-
-      const data = await response.json();
+      const data = await parseApiResponse<{ output: string }>(response);
 
       const finalSteps = currentPlan.actionableSteps.map(s =>
         s.stepOrder === stepOrder ? { ...s, executing: false, agentResult: data.output } : s
