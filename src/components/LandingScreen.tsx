@@ -19,6 +19,8 @@ import {
   AlertCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import cleobotLogo from "../assets/cleobot_logo.png";
+import { GmailLogoIcon, GoogleCalendarLogoIcon } from "./BrandLogos";
 
 interface LandingScreenProps {
   onGetStarted: () => void;
@@ -102,15 +104,15 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({
       <header className="bg-white border-b-2 border-black px-6 py-4 relative z-10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#FF4A8D] neo-border flex items-center justify-center neo-shadow rotate-[-2deg] transition-all hover:rotate-[0deg]">
-              <Zap className="w-5 h-5 text-black stroke-[3]" />
+            <div className="w-11 h-11 bg-white neo-border p-0.5 flex items-center justify-center neo-shadow rotate-[-2deg] transition-all hover:rotate-[0deg] overflow-hidden">
+              <img src={cleobotLogo} alt="Cleobot Logo" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h1 className="font-display font-black text-lg md:text-xl tracking-tight uppercase leading-none">
-                THE LAST-MINUTE LIFE SAVER
+              <h1 className="font-display font-black text-xl md:text-2.5xl tracking-tight uppercase leading-none">
+                CLEOBOT
               </h1>
-              <p className="text-[9px] font-mono font-bold text-zinc-500 uppercase mt-0.5 tracking-wider">
-                TACTICAL DEFENSE PROTOCOL
+              <p className="text-[9px] font-display font-black text-[#FF4A8D] uppercase mt-0.5 tracking-wider">
+                THE LAST-MINUTE LIFE SAVER
               </p>
             </div>
           </div>
@@ -340,8 +342,8 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({
             {/* Feature 2 */}
             <div className="bg-[#FFFEEF] neo-border p-6 neo-shadow flex flex-col justify-between hover:-translate-y-1 transition-transform">
               <div className="space-y-4">
-                <div className="w-10 h-10 rounded-none bg-[#FF4A8D] flex items-center justify-center neo-border-sm">
-                  <Mail className="w-5 h-5 text-black stroke-[2.5]" />
+                <div className="w-10 h-10 rounded-none bg-white flex items-center justify-center neo-border-sm">
+                  <GmailLogoIcon className="w-6 h-6" />
                 </div>
                 <h4 className="font-display font-black text-lg uppercase tracking-tight text-black">
                   GMAIL AUTO-HARVEST
@@ -359,8 +361,8 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({
             {/* Feature 3 */}
             <div className="bg-[#FFFEEF] neo-border p-6 neo-shadow flex flex-col justify-between hover:-translate-y-1 transition-transform">
               <div className="space-y-4">
-                <div className="w-10 h-10 rounded-none bg-[#10B981] flex items-center justify-center neo-border-sm">
-                  <CalendarIcon className="w-5 h-5 text-black stroke-[2.5]" />
+                <div className="w-10 h-10 rounded-none bg-white flex items-center justify-center neo-border-sm">
+                  <GoogleCalendarLogoIcon className="w-6 h-6" />
                 </div>
                 <h4 className="font-display font-black text-lg uppercase tracking-tight text-black">
                   CALENDAR BUFFER
@@ -474,7 +476,7 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({
             </div>
             <div>
               <h4 className="font-display font-black text-xl text-black leading-none">CLEOBOT v1.4</h4>
-              <span className="font-mono text-[9px] text-zinc-500 font-extrabold uppercase mt-1 block">CYNICAL CRISIS COMPANION</span>
+              <span className="font-display font-black text-[9px] text-zinc-500 uppercase mt-1 block">CYNICAL CRISIS COMPANION</span>
             </div>
           </div>
 

@@ -53,6 +53,8 @@ import {
 } from "./lib/firebase";
 import { AuthScreen } from "./components/AuthScreen";
 import { LandingScreen } from "./components/LandingScreen";
+import cleobotLogo from "./assets/cleobot_logo.png";
+import { GoogleLogoIcon, GmailLogoIcon, GoogleCalendarLogoIcon } from "./components/BrandLogos";
 
 const STRESS_PHRASES = [
   "DECRUNCHING YOUR EXTREME PANIC INDEX...",
@@ -67,28 +69,12 @@ const GUARDIAN_PRESETS = [
   {
     title: "Mode A: Harvest (Emails)",
     description: "Scan unread inbox notifications for hidden commitments & payment warnings.",
-    input: `From: billing@aws-services.com
-Subject: [URGENT] Account Termination Notice for waylenbarreto@gmail.com
-Body: Dear Valued Customer, We attempted to process your invoice payment of $47.34, but your debit card ending in 4352 was declined. You have until tomorrow at 11:30 AM to update your billing credentials, or all your active database containers, API gateways, and production host buckets will be permanently decommissioned.
-
-From: rent@apartments-live.com
-Subject: Apartment 4B Lease Renewal Deadline Expires Tomorrow!
-Body: This is a formal notification that your option to renew the lease for Apt 4B expires tomorrow at 5:00 PM. Failure to sign the renewal packet will trigger an automatic switch to month-to-month, adding a mandatory $250.00 monthly surcharge.
-
-From: wedding-committee@lovebirds.com
-Subject: RSVP Status Reminder: Best Man Speech Draft & Microphone Check
-Body: Hey Waylen, quick reminder that we need your final Best Man toast checklist and confirmation by tonight 10:00 PM so we can slot you into the audio production schedule!`
+    input: ""
   },
   {
     title: "Mode B: Block & Buffer (Calendar)",
     description: "Analyze calendar dumps and calculate structured defense slots.",
-    input: `Newly Discovered Deadline: Law and technology term essay due tomorrow morning at 9:00 AM (Estimated time required: 4 hours of intense research and drafting).
-
-My Calendar Events for today:
-- 09:00 AM - 10:30 AM: Corporate alignment sync & marketing strategy (Required attendance)
-- 11:30 AM - 12:30 PM: Client review panel & UI walkthrough
-- 01:00 PM - 02:00 PM: Team standup & QA check
-- 03:00 PM - 04:30 PM: Performance metrics report prep`
+    input: ""
   },
   {
     title: "Mode C: Escalate (Panic Mode)",
@@ -753,15 +739,15 @@ export default function App() {
       <header id="app-header" className="bg-white neo-border border-t-0 border-l-0 border-r-0 px-6 py-5">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="bg-[#FF4A8D] neo-border p-3 neo-shadow rotate-[-2deg] transition-all hover:rotate-[0deg]">
-              <Zap className="w-7 h-7 text-black stroke-[3]" />
+            <div className="w-14 h-14 bg-white neo-border p-1 neo-shadow rotate-[-2deg] transition-all hover:rotate-[0deg] overflow-hidden flex items-center justify-center">
+              <img src={cleobotLogo} alt="Cleobot Logo" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h1 className="font-display font-black text-2xl md:text-3.5xl tracking-tight uppercase leading-none">
-                THE LAST-MINUTE LIFE SAVER
+              <h1 className="font-display font-black text-3xl md:text-4.5xl tracking-tight uppercase leading-none text-black">
+                CLEOBOT
               </h1>
-              <p className="text-xs font-mono font-extrabold text-zinc-600 mt-1 uppercase">
-                Conversational De-Stressing, Time-Blocking & Automation Companion
+              <p className="text-xs font-display font-black text-[#FF4A8D] mt-1 uppercase">
+                THE LAST-MINUTE LIFE SAVER
               </p>
             </div>
           </div>
@@ -803,7 +789,7 @@ export default function App() {
                   onClick={handleLogin}
                   className="flex items-center gap-2 bg-[#FFBB00] hover:bg-amber-400 text-black font-black uppercase px-3 py-1.5 neo-border-sm neo-shadow-sm transition-all text-[10px] cursor-pointer"
                 >
-                  <Database className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <GoogleLogoIcon className="w-3.5 h-3.5" />
                   <span>SYNC HISTORY DATABASE</span>
                 </button>
               )}
@@ -814,7 +800,7 @@ export default function App() {
 
       {/* Welcome Greeting Banner for Authenticated User */}
       {user && (
-        <div className="max-w-7xl w-full mx-auto px-4 pt-6">
+        <div className="max-w-7xl w-full mx-auto px-4 pt-6 space-y-4">
           <div className="bg-[#FFFEEF] neo-border p-4 neo-shadow-sm flex items-center justify-between">
             <span className="text-xs font-mono font-black text-black">
               HEY {user.displayName ? user.displayName.toUpperCase() : user.email?.split('@')[0].toUpperCase()}! WELCOME BACK TO THE TACTICAL WORKSPACE.
@@ -822,6 +808,63 @@ export default function App() {
             <span className="text-[10px] font-mono font-bold bg-black text-white px-2 py-0.5 neo-border-sm uppercase">
               ACTIVE SESSION
             </span>
+          </div>
+
+          {/* Quick Shortcuts Panel */}
+          <div className="bg-white neo-border p-4 neo-shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono font-black uppercase text-zinc-500">QUICK SHORTCUTS:</span>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => {
+                  setActiveMainTab("planner");
+                  handleStartNewPlan();
+                  setTimeout(() => commandInputRef.current?.focus(), 100);
+                }}
+                className="bg-[#FF4A8D] hover:bg-rose-600 text-white px-3.5 py-2 text-[10px] font-display font-black border-2 border-black neo-shadow-sm transition-all cursor-pointer uppercase flex items-center gap-1.5 hover:-translate-x-[1px] hover:-translate-y-[1px]"
+              >
+                <Zap className="w-3.5 h-3.5 text-white" />
+                <span>Create New Plan</span>
+              </button>
+              <button
+                onClick={() => {
+                  setActiveMainTab("guardian");
+                  setSelectedMode("A");
+                  setGuardianInput(GUARDIAN_PRESETS[0].input);
+                }}
+                className="bg-[#FFBB00] hover:bg-amber-400 text-black px-3.5 py-2 text-[10px] font-display font-black border-2 border-black neo-shadow-sm transition-all cursor-pointer uppercase flex items-center gap-2 hover:-translate-x-[1px] hover:-translate-y-[1px]"
+              >
+                <div className="w-5.5 h-5.5 bg-white rounded-full neo-border-sm flex items-center justify-center p-0.5">
+                  <GmailLogoIcon className="w-3.5 h-3.5" />
+                </div>
+                <span>Scan Email Commitments</span>
+              </button>
+              <button
+                onClick={() => {
+                  setActiveMainTab("guardian");
+                  setSelectedMode("B");
+                  setGuardianInput(GUARDIAN_PRESETS[1].input);
+                }}
+                className="bg-[#10B981] hover:bg-emerald-600 text-black px-3.5 py-2 text-[10px] font-display font-black border-2 border-black neo-shadow-sm transition-all cursor-pointer uppercase flex items-center gap-2 hover:-translate-x-[1px] hover:-translate-y-[1px]"
+              >
+                <div className="w-5.5 h-5.5 bg-white rounded-full neo-border-sm flex items-center justify-center p-0.5">
+                  <GoogleCalendarLogoIcon className="w-3.5 h-3.5" />
+                </div>
+                <span>Buffer Calendar Blocks</span>
+              </button>
+              <button
+                onClick={() => {
+                  setActiveMainTab("guardian");
+                  setSelectedMode("C");
+                  setGuardianInput(GUARDIAN_PRESETS[2].input);
+                }}
+                className="bg-[#EF4444] hover:bg-red-600 text-white px-3.5 py-2 text-[10px] font-display font-black border-2 border-black neo-shadow-sm transition-all cursor-pointer uppercase flex items-center gap-1.5 hover:-translate-x-[1px] hover:-translate-y-[1px]"
+              >
+                <ShieldAlert className="w-3.5 h-3.5 text-white" />
+                <span>Simulate Call Siren</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -832,44 +875,7 @@ export default function App() {
         {/* Left hand side: Playful Sidebar (4 columns) */}
         <div className="lg:col-span-4 flex flex-col gap-6">
           
-          {/* Cleo Quirky Metric badgework */}
-          <div className="bg-[#7C3AED] text-white neo-border p-5 neo-shadow flex flex-col gap-4">
-            <div className="flex items-center justify-between border-b border-white/20 pb-2">
-              <span className="font-display font-extrabold text-xs uppercase tracking-wider">CRISIS METRICS</span>
-              <Activity className="w-5 h-5 text-white animate-pulse" />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-black/25 p-3 neo-border-sm">
-                <span className="text-[9px] font-mono font-extrabold text-[#FF4A8D] block">PANIC RATING</span>
-                <span className="text-lg font-display font-black uppercase block mt-1">
-                  {currentPlan ? (currentPlan.panicModeTrigger ? "ERUPTING" : "HIGH") : "STEADY"}
-                </span>
-              </div>
-              <div className="bg-black/25 p-3 neo-border-sm">
-                <span className="text-[9px] font-mono font-extrabold text-[#10B981] block">SLACK CHANCE</span>
-                <span className="text-lg font-display font-black uppercase block mt-1">
-                  {currentPlan ? (getCompletionPercentage() === 100 ? "0% SAFE" : "99%") : "100% IDLE"}
-                </span>
-              </div>
-              <div className="bg-black/25 p-3 neo-border-sm">
-                <span className="text-[9px] font-mono font-extrabold text-white block">FOCUS AMMUNITION</span>
-                <span className="text-lg font-display font-black uppercase block mt-1 flex items-center gap-1">
-                  <Coffee className="w-4 h-4 text-[#FFFEEF]" /> 100%
-                </span>
-              </div>
-              <div className="bg-black/25 p-3 neo-border-sm">
-                <span className="text-[9px] font-mono font-extrabold text-white block">AI ASSISTANCE</span>
-                <span className="text-lg font-display font-black uppercase block mt-1">
-                  ENABLED
-                </span>
-              </div>
-            </div>
 
-            <div className="bg-white/10 p-2.5 neo-border-sm font-mono text-[10px] text-zinc-150 leading-tight">
-              ROAST MULTIPLIER: <span className="font-bold text-[#FF4A8D]">5.0x</span> (MAXIMUM POWER SAVER MODE ACTIVATED)
-            </div>
-          </div>
 
           <HistorySidebar 
             plans={savedPlans} 
@@ -894,8 +900,8 @@ export default function App() {
               
               {/* Illustrative Cleo Avatar sticker */}
               <div className="flex-shrink-0 flex flex-col items-center">
-                <div className="w-14 h-14 bg-[#FFBB00] rounded-full neo-border flex items-center justify-center text-black relative neo-shadow">
-                  <Sparkles className="w-6 h-6 text-black" />
+                <div className="w-14 h-14 bg-white rounded-full neo-border flex items-center justify-center relative neo-shadow overflow-hidden p-1">
+                  <img src={cleobotLogo} alt="Cleobot Logo" className="w-full h-full object-contain" />
                   <span className="absolute -bottom-1 -right-1 bg-[#10B981] w-4.5 h-4.5 rounded-full neo-border-sm flex items-center justify-center text-[8px] text-black font-bold">
                     ✓
                   </span>
@@ -931,23 +937,25 @@ export default function App() {
           <div className="flex gap-4 border-b-2 border-black pb-4 mb-4">
             <button
               onClick={() => setActiveMainTab("planner")}
-              className={`px-5 py-2.5 font-display font-black text-xs uppercase tracking-wider neo-border transition-all cursor-pointer ${
+              className={`px-5 py-2.5 font-display font-black text-xs uppercase tracking-wider neo-border transition-all cursor-pointer flex items-center gap-2 ${
                 activeMainTab === "planner"
                   ? "bg-[#FF4A8D] text-black neo-shadow-sm translate-x-[-1px] translate-y-[-1px]"
                   : "bg-white text-zinc-600 hover:text-black hover:bg-[#FFFEEF]"
               }`}
             >
-              Crisis Game Planner
+              <Zap className="w-4 h-4 text-black stroke-[2.5]" />
+              <span>Crisis Game Planner</span>
             </button>
             <button
               onClick={() => setActiveMainTab("guardian")}
-              className={`px-5 py-2.5 font-display font-black text-xs uppercase tracking-wider neo-border transition-all cursor-pointer ${
+              className={`px-5 py-2.5 font-display font-black text-xs uppercase tracking-wider neo-border transition-all cursor-pointer flex items-center gap-2 ${
                 activeMainTab === "guardian"
                   ? "bg-[#7C3AED] text-white neo-shadow-sm translate-x-[-1px] translate-y-[-1px]"
                   : "bg-white text-zinc-600 hover:text-black hover:bg-[#FFFEEF]"
               }`}
             >
-              Proactive Guardian Engine
+              <Shield className="w-4 h-4 stroke-[2.5]" />
+              <span>Proactive Guardian Engine</span>
             </button>
           </div>
 
@@ -1060,49 +1068,35 @@ export default function App() {
                     {/* Integrated Control Panel */}
                     <div className="flex flex-wrap gap-2.5">
                       {selectedMode === "A" && (
-                        <>
-                          <button
-                            type="button"
-                            onClick={async () => {
-                              await handleLoadGmail(true);
-                            }}
-                            disabled={gmailLoading}
-                            className="flex items-center gap-1.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white border border-black text-[10px] font-mono font-black px-3 py-1.5 uppercase cursor-pointer disabled:opacity-50 neo-shadow-sm transition-all hover:-translate-x-[1px] hover:-translate-y-[1px]"
-                          >
-                            <Mail className="w-3.5 h-3.5 text-white" />
-                            <span>{gmailLoading ? "PULLING REAL INBOX..." : "PULL & ANALYZE MY LIVE GMAIL"}</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setGuardianInput(GUARDIAN_PRESETS[0].input)}
-                            className="bg-white hover:bg-zinc-50 border border-black text-[10px] font-mono font-bold px-3 py-1.5 uppercase cursor-pointer"
-                          >
-                            LOAD SAMPLE INBOX
-                          </button>
-                        </>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await handleLoadGmail(true);
+                          }}
+                          disabled={gmailLoading}
+                          className="flex items-center gap-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white border border-black text-[10px] font-mono font-black px-3 py-1.5 uppercase cursor-pointer disabled:opacity-50 neo-shadow-sm transition-all hover:-translate-x-[1px] hover:-translate-y-[1px]"
+                        >
+                          <div className="w-5.5 h-5.5 bg-white rounded-full neo-border-sm flex items-center justify-center p-0.5 flex-shrink-0">
+                            <GmailLogoIcon className="w-3 h-3" />
+                          </div>
+                          <span>{gmailLoading ? "PULLING REAL INBOX..." : "PULL & ANALYZE MY LIVE GMAIL"}</span>
+                        </button>
                       )}
 
                       {selectedMode === "B" && (
-                        <>
-                          <button
-                            type="button"
-                            onClick={async () => {
-                              await handleLoadCalendar(true);
-                            }}
-                            disabled={calendarLoading}
-                            className="flex items-center gap-1.5 bg-[#10B981] hover:bg-[#059669] text-black border border-black text-[10px] font-mono font-black px-3 py-1.5 uppercase cursor-pointer disabled:opacity-50 neo-shadow-sm transition-all hover:-translate-x-[1px] hover:-translate-y-[1px]"
-                          >
-                            <CalendarIcon className="w-3.5 h-3.5 text-black" />
-                            <span>{calendarLoading ? "PULLING REAL SCHEDULE..." : "PULL & ANALYZE MY LIVE CALENDAR"}</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setGuardianInput(GUARDIAN_PRESETS[1].input)}
-                            className="bg-white hover:bg-zinc-50 border border-black text-[10px] font-mono font-bold px-3 py-1.5 uppercase cursor-pointer"
-                          >
-                            LOAD SAMPLE SCHEDULE
-                          </button>
-                        </>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await handleLoadCalendar(true);
+                          }}
+                          disabled={calendarLoading}
+                          className="flex items-center gap-2 bg-[#10B981] hover:bg-[#059669] text-black border border-black text-[10px] font-mono font-black px-3 py-1.5 uppercase cursor-pointer disabled:opacity-50 neo-shadow-sm transition-all hover:-translate-x-[1px] hover:-translate-y-[1px]"
+                        >
+                          <div className="w-5.5 h-5.5 bg-white rounded-full neo-border-sm flex items-center justify-center p-0.5 flex-shrink-0">
+                            <GoogleCalendarLogoIcon className="w-3 h-3" />
+                          </div>
+                          <span>{calendarLoading ? "PULLING REAL SCHEDULE..." : "PULL & ANALYZE MY LIVE CALENDAR"}</span>
+                        </button>
                       )}
 
                       {selectedMode === "C" && (
@@ -1167,12 +1161,15 @@ Evaluate system state and generate a protective escalation backup call or delay-
                     className="w-full bg-white border-2 border-black p-3 font-mono text-xs text-black focus:outline-none focus:ring-0 focus:border-[#7C3AED]"
                   />
 
-                  <div className="flex justify-between items-center gap-2 flex-wrap">
-                    <span className="text-[10px] font-mono font-extrabold text-zinc-500 uppercase">
-                      {selectedMode === "A" && "TIP: Mode A identifies dates, payment targets, and RSVPs."}
-                      {selectedMode === "B" && "TIP: Mode B reserves active focus blocks within your schedule."}
-                      {selectedMode === "C" && "TIP: Mode C creates defensive call scripts when failure is imminent."}
-                    </span>
+                  <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 border-t border-black/10 pt-3">
+                    <div className="bg-[#FFFEEF] border-2 border-black p-2.5 font-mono text-[9px] text-black uppercase font-bold flex items-center gap-1.5 flex-1 neo-shadow-sm">
+                      <Sparkles className="w-4 h-4 text-[#FFBB00] flex-shrink-0 animate-pulse" />
+                      <span>
+                        {selectedMode === "A" && "TIP: Mode A scans live inbox snippets to harvest financial and contract deadlines."}
+                        {selectedMode === "B" && "TIP: Mode B computes calendar intervals and reserves focus buffers."}
+                        {selectedMode === "C" && "TIP: Mode C builds excuses and delay scripts when failure is imminent."}
+                      </span>
+                    </div>
                     <button
                       type="button"
                       disabled={guardianLoading || !guardianInput.trim()}
@@ -1434,6 +1431,51 @@ Evaluate system state and generate a protective escalation backup call or delay-
                   </p>
                 </div>
 
+                {/* Central Inline Task Creator */}
+                <form onSubmit={handleAnalyzeTask} className="bg-[#FFFEEF] neo-border p-5 space-y-4">
+                  <div className="flex items-center gap-2 border-b border-black/10 pb-2">
+                    <Zap className="w-4 h-4 text-[#FF4A8D]" />
+                    <span className="text-[10px] font-mono font-black text-black uppercase">
+                      FAST TASK GAME PLANNER
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-mono font-bold text-zinc-500 uppercase block">
+                      ENTER YOUR PANIC DELIVERABLE:
+                    </label>
+                    <input
+                      type="text"
+                      value={taskInput}
+                      onChange={(e) => setTaskInput(e.target.value)}
+                      placeholder="e.g., AWS database declined cards, lease renewals expiring tomorrow at 5pm..."
+                      className="w-full bg-white border-2 border-black p-2.5 font-mono text-xs focus:outline-none focus:ring-0 focus:border-[#FF4A8D] text-black uppercase placeholder-zinc-400 font-extrabold"
+                    />
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+                    <div className="flex items-center gap-1.5 bg-white neo-border-sm px-2.5 py-1.5">
+                      <span className="text-[9px] font-mono font-black text-zinc-500 uppercase">DUE:</span>
+                      <input
+                        type="text"
+                        value={dueInfo}
+                        onChange={(e) => setDueInfo(e.target.value)}
+                        placeholder="ASAP"
+                        className="bg-transparent border-none text-xs text-black font-extrabold focus:outline-none focus:ring-0 uppercase w-20 placeholder-zinc-400"
+                      />
+                    </div>
+                    
+                    <button
+                      type="submit"
+                      disabled={loading || !taskInput.trim()}
+                      className="bg-black hover:bg-zinc-900 text-white font-mono font-black text-xs uppercase px-6 py-2.5 neo-border-sm neo-shadow-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-40"
+                    >
+                      <span>DE-STRESS ME</span>
+                      <Send className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </form>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {templates.map((tpl) => (
                     <button
@@ -1486,13 +1528,23 @@ Evaluate system state and generate a protective escalation backup call or delay-
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
                     <div className="space-y-3 flex-1">
                       
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[10px] font-mono font-black uppercase bg-[#EF4444] text-white px-2.5 py-0.5 neo-border-sm">
-                          {currentPlan.priority} CRISIS WINDOW
-                        </span>
-                        <span className="font-mono text-[10px] text-black font-black bg-[#FFFEEF] px-2.5 py-0.5 neo-border-sm uppercase">
-                          {currentPlan.estimatedTotalMinutes} MINUTE BUDGET
-                        </span>
+                      <div className="flex justify-between items-center flex-wrap gap-2 mr-6">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[10px] font-mono font-black uppercase bg-[#EF4444] text-white px-2.5 py-0.5 neo-border-sm">
+                            {currentPlan.priority} CRISIS WINDOW
+                          </span>
+                          <span className="font-mono text-[10px] text-black font-black bg-[#FFFEEF] px-2.5 py-0.5 neo-border-sm uppercase">
+                            {currentPlan.estimatedTotalMinutes} MINUTE BUDGET
+                          </span>
+                        </div>
+                        <button
+                          onClick={handleStartNewPlan}
+                          className="bg-[#FFBB00] hover:bg-amber-400 text-black text-[9px] font-mono font-black px-2.5 py-1 neo-border-sm neo-shadow-sm transition-all uppercase cursor-pointer flex items-center gap-1"
+                          title="CREATE A NEW PLAN"
+                        >
+                          <RotateCcw className="w-3 h-3 stroke-[2.5]" />
+                          <span>NEW PLAN</span>
+                        </button>
                       </div>
 
                       <h3 className="text-xs font-mono font-black text-zinc-500 uppercase tracking-widest block">
@@ -1653,7 +1705,7 @@ Evaluate system state and generate a protective escalation backup call or delay-
       </main>
 
       {/* 3. THE FLOATING RETRO-POP COMMAND BAR */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl px-4">
+      <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl px-4">
         <form 
           onSubmit={handleAnalyzeTask}
           className="bg-[#FFFEEF] neo-border shadow-lg p-3 md:p-4.5 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 relative transition-all focus-within:shadow-[6px_6px_0px_0px_#FF4A8D]"

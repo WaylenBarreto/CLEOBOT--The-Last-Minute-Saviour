@@ -17,6 +17,8 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { motion } from "motion/react";
+import cleobotLogo from "../assets/cleobot_logo.png";
+import { GoogleLogoIcon } from "./BrandLogos";
 
 interface AuthScreenProps {
   onAuthSuccess: (user: any, token: string | null) => void;
@@ -109,14 +111,14 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess, onBackToL
         {/* Header Decors */}
         <div className="flex justify-between items-center border-b-2 border-black pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-none bg-[#FF4A8D] flex items-center justify-center neo-border-sm text-black">
-              <Shield className="w-4.5 h-4.5 stroke-[2.5]" />
+            <div className="w-10 h-10 bg-white flex items-center justify-center neo-border-sm overflow-hidden">
+              <img src={cleobotLogo} alt="Cleobot Logo" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h2 className="font-display font-black text-sm tracking-tight uppercase text-black">
-                LAST-MINUTE SAVIOR
+              <h2 className="font-display font-black text-base tracking-tight uppercase text-black">
+                CLEOBOT
               </h2>
-              <p className="text-[9px] font-mono font-bold uppercase text-zinc-500">
+              <p className="text-[9px] font-display font-black uppercase text-[#FF4A8D]">
                 CRISIS AGENT GATEWAY
               </p>
             </div>
@@ -196,7 +198,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess, onBackToL
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Agent Waylen Barreto"
-                className="w-full bg-white neo-border p-2.5 font-mono text-xs focus:outline-none focus:ring-0 placeholder-zinc-400 text-black uppercase"
+                className="w-full bg-white neo-border p-2.5 font-mono text-xs focus:outline-none focus:ring-0 placeholder-zinc-400 text-black"
               />
             </div>
           )}
@@ -212,14 +214,14 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess, onBackToL
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="agent@crisis-savior.com"
-              className="w-full bg-white neo-border p-2.5 font-mono text-xs focus:outline-none focus:ring-0 placeholder-zinc-400 text-black uppercase"
+              className="w-full bg-white neo-border p-2.5 font-mono text-xs focus:outline-none focus:ring-0 placeholder-zinc-400 text-black"
             />
           </div>
 
           <div className="space-y-1.5">
             <label className="text-[10px] font-mono font-black uppercase text-black flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5" />
-              <span>PASSWORD PASSWORD</span>
+              <span>PASSWORD</span>
             </label>
             <input
               type="password"
@@ -267,7 +269,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess, onBackToL
           disabled={loading}
           className="w-full bg-[#FFBB00] hover:bg-amber-400 text-black py-3 font-mono font-black text-xs uppercase neo-border neo-shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
         >
-          <Database className="w-4 h-4 stroke-[2.5]" />
+          <GoogleLogoIcon className="w-4 h-4" />
           <span>{loading ? "CONNECTING..." : "SIGN IN WITH GOOGLE SYNC"}</span>
         </button>
 
