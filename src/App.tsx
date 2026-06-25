@@ -52,6 +52,7 @@ import {
   getScansFromFirestore
 } from "./lib/firebase";
 import { AuthScreen } from "./components/AuthScreen";
+import { LandingScreen } from "./components/LandingScreen";
 
 const STRESS_PHRASES = [
   "DECRUNCHING YOUR EXTREME PANIC INDEX...",
@@ -137,6 +138,7 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [showLanding, setShowLanding] = useState(true);
   const [scansHistory, setScansHistory] = useState<any[]>([]);
   const [gmailLoading, setGmailLoading] = useState(false);
   const [calendarLoading, setCalendarLoading] = useState(false);
@@ -169,6 +171,7 @@ export default function App() {
       await logout();
       setUser(null);
       setToken(null);
+      setShowLanding(true);
       setScansHistory([]);
       // fallback to localStorage
       const saved = localStorage.getItem("last_minute_life_saver_plans");
@@ -696,7 +699,7 @@ export default function App() {
       <div className="min-h-screen bg-[#FFFEEF] flex flex-col items-center justify-center font-mono p-6">
         <div className="w-full max-w-sm bg-white neo-border p-6 neo-shadow text-center space-y-4">
           <span className="text-[11px] font-mono font-black uppercase text-black animate-pulse block">
-            🔒 INITIALIZING SECURE CREDENTIALS ENCLAVE...
+            INITIALIZING SECURE CREDENTIALS ENCLAVE...
           </span>
           <div className="h-2 w-full bg-zinc-100 neo-border-sm overflow-hidden relative">
             <div className="h-full bg-black absolute inset-y-0 left-0 w-1/3 animate-[infinite-scroll_1.5s_linear_infinite]" style={{
@@ -712,6 +715,15 @@ export default function App() {
   }
 
   if (!user) {
+    if (showLanding) {
+      return (
+        <LandingScreen 
+          onGetStarted={() => setShowLanding(false)} 
+          onSignInClick={() => setShowLanding(false)} 
+        />
+      );
+    }
+
     return (
       <AuthScreen 
         onAuthSuccess={async (authUser, accessToken) => {
@@ -729,6 +741,7 @@ export default function App() {
             setAuthLoading(false);
           }
         }}
+        onBackToLanding={() => setShowLanding(true)}
       />
     );
   }
@@ -736,12 +749,6 @@ export default function App() {
   return (
     <div id="app-root" className="min-h-screen bg-[#F8F9FA] text-black font-sans flex flex-col pb-36 selection:bg-[#FF4A8D] selection:text-white">
       
-      {/* Motivational Quote Top Banner */}
-      <div className="bg-[#FFFEEF] neo-border-sm border-t-0 border-l-0 border-r-0 py-2.5 px-4 text-center text-sm font-mono font-black uppercase text-black flex items-center justify-center gap-2">
-        <span className="text-amber-500 animate-bounce text-base">💡</span>
-        <span>A stitch in time saves nine &bull; Handle tasks early, prevent future chaos!</span>
-      </div>
-
       {/* Playful Top Header */}
       <header id="app-header" className="bg-white neo-border border-t-0 border-l-0 border-r-0 px-6 py-5">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
@@ -773,13 +780,15 @@ export default function App() {
                 <span className="text-[10px] font-black uppercase text-zinc-500 animate-pulse px-2">INITIALIZING SECURE HISTORY SYNC...</span>
               ) : user ? (
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 bg-[#FFFEEF] neo-border-sm px-2 py-1">
+                  <div className="flex items-center gap-1.5 bg-[#FFFEEF] neo-border-sm px-2.5 py-1">
                     {user.photoURL ? (
                       <img src={user.photoURL} alt={user.displayName || "User"} className="w-4 h-4 rounded-full border border-black" referrerPolicy="no-referrer" />
                     ) : (
                       <UserIcon className="w-3.5 h-3.5 text-black" />
                     )}
-                    <span className="text-black font-extrabold uppercase text-[10px] max-w-[120px] truncate">{user.displayName || user.email}</span>
+                    <span className="text-black font-extrabold uppercase text-[10px] max-w-[200px] truncate">
+                      HEY {user.displayName ? user.displayName : user.email?.split('@')[0]}!
+                    </span>
                   </div>
                   <button
                     onClick={handleLogout}
@@ -802,6 +811,20 @@ export default function App() {
           </div>
         </div>
       </header>
+
+      {/* Welcome Greeting Banner for Authenticated User */}
+      {user && (
+        <div className="max-w-7xl w-full mx-auto px-4 pt-6">
+          <div className="bg-[#FFFEEF] neo-border p-4 neo-shadow-sm flex items-center justify-between">
+            <span className="text-xs font-mono font-black text-black">
+              HEY {user.displayName ? user.displayName.toUpperCase() : user.email?.split('@')[0].toUpperCase()}! WELCOME BACK TO THE TACTICAL WORKSPACE.
+            </span>
+            <span className="text-[10px] font-mono font-bold bg-black text-white px-2 py-0.5 neo-border-sm uppercase">
+              ACTIVE SESSION
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Main Workspace Layout */}
       <main id="app-workspace" className="max-w-7xl w-full mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1">
@@ -1146,9 +1169,9 @@ Evaluate system state and generate a protective escalation backup call or delay-
 
                   <div className="flex justify-between items-center gap-2 flex-wrap">
                     <span className="text-[10px] font-mono font-extrabold text-zinc-500 uppercase">
-                      {selectedMode === "A" && "💡 TIP: Mode A identifies dates, payment targets, and RSVPs."}
-                      {selectedMode === "B" && "💡 TIP: Mode B reserves active focus blocks within your schedule."}
-                      {selectedMode === "C" && "💡 TIP: Mode C creates defensive call scripts when failure is imminent."}
+                      {selectedMode === "A" && "TIP: Mode A identifies dates, payment targets, and RSVPs."}
+                      {selectedMode === "B" && "TIP: Mode B reserves active focus blocks within your schedule."}
+                      {selectedMode === "C" && "TIP: Mode C creates defensive call scripts when failure is imminent."}
                     </span>
                     <button
                       type="button"
@@ -1745,8 +1768,8 @@ Evaluate system state and generate a protective escalation backup call or delay-
         )}
       </AnimatePresence>
 
-      <footer className="mt-auto py-12 border-t-2 border-black bg-white text-center text-xs text-zinc-600 font-mono uppercase font-black">
-        © 2026 THE LAST-MINUTE LIFE SAVER • HIGH INTENSITY COMPANION • POWERED BY CLEOBOT ⚡
+      <footer className="mt-auto py-8 border-t-2 border-black bg-white text-center text-xs font-mono uppercase font-black">
+        THE LAST-MINUTE LIFE SAVER &bull; BUILT BY WAYLEN BARRETO
       </footer>
     </div>
   );

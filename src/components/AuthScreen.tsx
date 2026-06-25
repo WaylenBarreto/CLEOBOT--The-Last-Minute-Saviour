@@ -13,15 +13,17 @@ import {
   LogIn, 
   UserPlus, 
   Database,
-  ArrowRight
+  ArrowRight,
+  ArrowLeft
 } from "lucide-react";
 import { motion } from "motion/react";
 
 interface AuthScreenProps {
   onAuthSuccess: (user: any, token: string | null) => void;
+  onBackToLanding?: () => void;
 }
 
-export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
+export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess, onBackToLanding }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -92,6 +94,18 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
         transition={{ duration: 0.4, ease: "easeOut" }}
         className="w-full max-w-md bg-white neo-border p-6 sm:p-8 neo-shadow relative z-10 space-y-6"
       >
+        {/* Back Button */}
+        {onBackToLanding && (
+          <button 
+            type="button"
+            onClick={onBackToLanding}
+            className="inline-flex items-center gap-1.5 text-[10px] font-mono font-black uppercase text-zinc-500 hover:text-black transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span>← BACK TO BRIEFING</span>
+          </button>
+        )}
+
         {/* Header Decors */}
         <div className="flex justify-between items-center border-b-2 border-black pb-4">
           <div className="flex items-center gap-2.5">
