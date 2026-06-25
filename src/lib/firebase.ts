@@ -2,6 +2,8 @@ import { initializeApp } from "firebase/app";
 import {
   getAuth,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   onAuthStateChanged,
   User,
@@ -43,8 +45,18 @@ provider.addScope("https://www.googleapis.com/auth/userinfo.profile");
 provider.addScope("https://www.googleapis.com/auth/calendar.readonly");
 provider.addScope("https://www.googleapis.com/auth/gmail.readonly");
 
+// Force account selection every time (prevents auto-reuse of wrong account)
+provider.setCustomParameters({ prompt: "select_account" });
+
 let isSigningIn = false;
 let cachedAccessToken: string | null = null;
+
+// Detect mobile browsers — popups are blocked on iOS Safari and some Android browsers
+const isMobileBrowser = (): boolean => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+};
 
 // Helper to prevent Firestore calls from hanging indefinitely when database is not configured
 const withTimeout = <T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> => {
@@ -86,8 +98,15 @@ export const initAuth = (
   });
 };
 
-// Sign in with Google Popup
+// Sign in with Google — uses Popup on desktop, Redirect on mobile (popups are blocked on mobile browsers)
 export const googleSignIn = async (): Promise<{ user: User; accessToken: string } | null> => {
+  if (isMobileBrowser()) {
+    // On mobile, redirect the entire page. The result is handled by checkRedirectResult on page load.
+    await signInWithRedirect(auth, provider);
+    return null; // Page will reload; result is captured in checkRedirectResult
+  }
+
+  // Desktop: use popup
   try {
     isSigningIn = true;
     const result = await signInWithPopup(auth, provider);
@@ -96,7 +115,6 @@ export const googleSignIn = async (): Promise<{ user: User; accessToken: string 
       throw new Error("Failed to get Google Access Token from Auth Result");
     }
     cachedAccessToken = credential.accessToken;
-    // Save to profiles
     await saveUserProfile(result.user.uid, result.user.email || "", result.user.displayName || undefined);
     return { user: result.user, accessToken: cachedAccessToken };
   } catch (error) {
@@ -106,6 +124,23 @@ export const googleSignIn = async (): Promise<{ user: User; accessToken: string 
     isSigningIn = false;
   }
 };
+
+// Call this once on app mount to pick up the token after a mobile redirect sign-in
+export const checkRedirectResult = async (): Promise<{ user: User; accessToken: string } | null> => {
+  try {
+    const result = await getRedirectResult(auth);
+    if (!result) return null;
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    if (!credential?.accessToken) return null;
+    cachedAccessToken = credential.accessToken;
+    await saveUserProfile(result.user.uid, result.user.email || "", result.user.displayName || undefined);
+    return { user: result.user, accessToken: cachedAccessToken };
+  } catch (error) {
+    console.error("Redirect result error:", error);
+    return null;
+  }
+};
+
 
 // Email & Password Signup
 export const signUpWithEmail = async (email: string, pass: string, name: string): Promise<User> => {

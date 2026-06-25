@@ -44,6 +44,7 @@ import { User } from "firebase/auth";
 import {
   initAuth,
   googleSignIn,
+  checkRedirectResult,
   logout,
   savePlanToFirestore,
   getPlansFromFirestore,
@@ -387,10 +388,22 @@ export default function App() {
 
   // Initialize Auth state observer on mount
   useEffect(() => {
+    // On mobile, Google sign-in uses a page redirect. Capture the token from that
+    // redirect result as soon as the app mounts (before the auth state fires).
+    checkRedirectResult().then((redirectData) => {
+      if (redirectData) {
+        setUser(redirectData.user);
+        setToken(redirectData.accessToken);
+        setShowLanding(false);
+      }
+    }).catch(() => { /* silently ignore if no redirect pending */ });
+
     const unsubscribe = initAuth(
       async (authUser, accessToken) => {
         setUser(authUser);
-        setToken(accessToken);
+        // Only overwrite the token from initAuth if we don't already have one
+        // (the redirect result may have set a fresher token above)
+        setToken(prev => prev || accessToken);
         setAuthLoading(false);
         try {
           const dbPlans = await getPlansFromFirestore(authUser.uid);
