@@ -1,7 +1,6 @@
 import express from "express";
 import path from "path";
 import dotenv from "dotenv";
-import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 
 // Load environment variables
@@ -11,6 +10,14 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+
+app.get("/api/health", (_req, res) => {
+  res.json({
+    ok: true,
+    geminiConfigured: Boolean(process.env.GEMINI_API_KEY),
+    runtime: process.env.VERCEL ? "vercel" : "node",
+  });
+});
 
 function parseJsonObjectFromModelText<T>(text: string, context: string): T {
   const trimmed = text.trim();
@@ -535,6 +542,7 @@ ${streamInput}
 // Serve Vite in development, static in production
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
