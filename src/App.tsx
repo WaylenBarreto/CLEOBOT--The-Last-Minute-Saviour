@@ -44,7 +44,6 @@ import { User } from "firebase/auth";
 import {
   initAuth,
   googleSignIn,
-  checkRedirectResult,
   logout,
   savePlanToFirestore,
   getPlansFromFirestore,
@@ -216,13 +215,8 @@ export default function App() {
     setError(null);
     try {
       if (!currentToken) {
-        // Save intent so it survives a mobile redirect page-reload
-        sessionStorage.setItem("cleo_pending_action", JSON.stringify({ type: "gmail", autoAnalyze }));
         const result = await googleSignIn();
-        // On mobile, googleSignIn calls signInWithRedirect → page reloads here.
-        // The pending action is executed in the mount useEffect after the redirect.
         if (result) {
-          sessionStorage.removeItem("cleo_pending_action");
           setUser(result.user);
           setToken(result.accessToken);
           currentToken = result.accessToken;
@@ -231,8 +225,7 @@ export default function App() {
           const dbScans = await getScansFromFirestore(result.user.uid);
           setScansHistory(dbScans);
         } else {
-          // On mobile the redirect has started — function will not continue here
-          return;
+          throw new Error("Google authentication is required to pull real-time Gmail messages.");
         }
       }
 
@@ -240,31 +233,26 @@ export default function App() {
         headers: { Authorization: `Bearer ${currentToken}` },
       });
       if (!res.ok) {
-        const errStatus = res.status;
-        if (errStatus === 401 || errStatus === 403) {
-          // Token expired — save intent and re-auth
-          sessionStorage.setItem("cleo_pending_action", JSON.stringify({ type: "gmail", autoAnalyze }));
-          const result = await googleSignIn();
-          if (result) {
-            sessionStorage.removeItem("cleo_pending_action");
-            setUser(result.user);
-            setToken(result.accessToken);
-            currentToken = result.accessToken;
-            const retryRes = await fetch("/api/google/gmail", {
-              headers: { Authorization: `Bearer ${currentToken}` },
-            });
-            if (!retryRes.ok) {
-              throw new Error("Gmail access was denied. Make sure your Google account is added as a test user in Google Cloud Console.");
-            }
-            const retryData = await retryRes.json();
-            setGuardianInput(retryData.formattedText);
-            if (autoAnalyze) await triggerDirectAnalyze(retryData.formattedText);
-            return;
+        // If expired or unauthorized, try to renew once
+        const result = await googleSignIn();
+        if (result) {
+          setUser(result.user);
+          setToken(result.accessToken);
+          currentToken = result.accessToken;
+          const retryRes = await fetch("/api/google/gmail", {
+            headers: { Authorization: `Bearer ${currentToken}` },
+          });
+          if (!retryRes.ok) {
+            throw new Error("Failed to load Gmail messages. Check your Google Workspace authorization.");
           }
-          return; // Redirect started on mobile
+          const retryData = await retryRes.json();
+          setGuardianInput(retryData.formattedText);
+          if (autoAnalyze) {
+            await triggerDirectAnalyze(retryData.formattedText);
+          }
+          return;
         }
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || `Gmail API returned error ${errStatus}. Make sure Gmail API is enabled in Google Cloud Console.`);
+        throw new Error("Failed to load Gmail messages. Check your Google Workspace authorization.");
       }
       const data = await res.json();
       setGuardianInput(data.formattedText);
@@ -272,7 +260,7 @@ export default function App() {
         await triggerDirectAnalyze(data.formattedText);
       }
     } catch (err: any) {
-      setError(err.message || "Failed to load Gmail. Please sign out and sign back in with your Google account.");
+      setError(err.message || "Failed to load Gmail feeds.");
     } finally {
       setGmailLoading(false);
     }
@@ -285,11 +273,8 @@ export default function App() {
     setError(null);
     try {
       if (!currentToken) {
-        // Save intent so it survives a mobile redirect page-reload
-        sessionStorage.setItem("cleo_pending_action", JSON.stringify({ type: "calendar", autoAnalyze }));
         const result = await googleSignIn();
         if (result) {
-          sessionStorage.removeItem("cleo_pending_action");
           setUser(result.user);
           setToken(result.accessToken);
           currentToken = result.accessToken;
@@ -298,7 +283,7 @@ export default function App() {
           const dbScans = await getScansFromFirestore(result.user.uid);
           setScansHistory(dbScans);
         } else {
-          return; // Mobile redirect started
+          throw new Error("Google authentication is required to pull real-time Google Calendar streams.");
         }
       }
 
@@ -306,30 +291,26 @@ export default function App() {
         headers: { Authorization: `Bearer ${currentToken}` },
       });
       if (!res.ok) {
-        const errStatus = res.status;
-        if (errStatus === 401 || errStatus === 403) {
-          sessionStorage.setItem("cleo_pending_action", JSON.stringify({ type: "calendar", autoAnalyze }));
-          const result = await googleSignIn();
-          if (result) {
-            sessionStorage.removeItem("cleo_pending_action");
-            setUser(result.user);
-            setToken(result.accessToken);
-            currentToken = result.accessToken;
-            const retryRes = await fetch("/api/google/calendar", {
-              headers: { Authorization: `Bearer ${currentToken}` },
-            });
-            if (!retryRes.ok) {
-              throw new Error("Calendar access was denied. Make sure your Google account is added as a test user in Google Cloud Console.");
-            }
-            const retryData = await retryRes.json();
-            setGuardianInput(retryData.formattedText);
-            if (autoAnalyze) await triggerDirectAnalyze(retryData.formattedText);
-            return;
+        // If expired or unauthorized, try to renew once
+        const result = await googleSignIn();
+        if (result) {
+          setUser(result.user);
+          setToken(result.accessToken);
+          currentToken = result.accessToken;
+          const retryRes = await fetch("/api/google/calendar", {
+            headers: { Authorization: `Bearer ${currentToken}` },
+          });
+          if (!retryRes.ok) {
+            throw new Error("Failed to load Google Calendar. Check your Google Workspace authorization.");
           }
-          return; // Redirect started
+          const retryData = await retryRes.json();
+          setGuardianInput(retryData.formattedText);
+          if (autoAnalyze) {
+            await triggerDirectAnalyze(retryData.formattedText);
+          }
+          return;
         }
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || `Calendar API returned error ${errStatus}. Make sure Google Calendar API is enabled in Google Cloud Console.`);
+        throw new Error("Failed to load Google Calendar. Check your Google Workspace authorization.");
       }
       const data = await res.json();
       setGuardianInput(data.formattedText);
@@ -337,7 +318,7 @@ export default function App() {
         await triggerDirectAnalyze(data.formattedText);
       }
     } catch (err: any) {
-      setError(err.message || "Failed to load Calendar. Please sign out and sign back in with your Google account.");
+      setError(err.message || "Failed to load Calendar schedule.");
     } finally {
       setCalendarLoading(false);
     }
@@ -406,58 +387,10 @@ export default function App() {
 
   // Initialize Auth state observer on mount
   useEffect(() => {
-    // On mobile, Google sign-in uses a page redirect. Capture the token from that
-    // redirect result as soon as the app mounts (before the auth state fires).
-    checkRedirectResult().then(async (redirectData) => {
-      if (redirectData) {
-        setUser(redirectData.user);
-        setToken(redirectData.accessToken);
-        setShowLanding(false);
-
-        // Check if there was a pending action saved before the redirect (mobile flow)
-        const pendingRaw = sessionStorage.getItem("cleo_pending_action");
-        if (pendingRaw) {
-          sessionStorage.removeItem("cleo_pending_action");
-          try {
-            const pending = JSON.parse(pendingRaw) as { type: string; autoAnalyze: boolean };
-            // Small delay to let React settle state before fetching
-            await new Promise(r => setTimeout(r, 300));
-            if (pending.type === "gmail") {
-              setGmailLoading(true);
-              const res = await fetch("/api/google/gmail", {
-                headers: { Authorization: `Bearer ${redirectData.accessToken}` },
-              });
-              if (res.ok) {
-                const data = await res.json();
-                setGuardianInput(data.formattedText);
-                if (pending.autoAnalyze) await triggerDirectAnalyze(data.formattedText);
-              }
-              setGmailLoading(false);
-            } else if (pending.type === "calendar") {
-              setCalendarLoading(true);
-              const res = await fetch("/api/google/calendar", {
-                headers: { Authorization: `Bearer ${redirectData.accessToken}` },
-              });
-              if (res.ok) {
-                const data = await res.json();
-                setGuardianInput(data.formattedText);
-                if (pending.autoAnalyze) await triggerDirectAnalyze(data.formattedText);
-              }
-              setCalendarLoading(false);
-            }
-          } catch (e) {
-            console.error("Failed to execute pending action after redirect:", e);
-          }
-        }
-      }
-    }).catch(() => { /* silently ignore if no redirect pending */ });
-
     const unsubscribe = initAuth(
       async (authUser, accessToken) => {
         setUser(authUser);
-        // Only overwrite the token from initAuth if we don't already have one
-        // (the redirect result may have set a fresher token above)
-        setToken(prev => prev || accessToken);
+        setToken(accessToken);
         setAuthLoading(false);
         try {
           const dbPlans = await getPlansFromFirestore(authUser.uid);
@@ -484,7 +417,6 @@ export default function App() {
     );
     return () => unsubscribe();
   }, []);
-
 
   // Sync clock
   useEffect(() => {
