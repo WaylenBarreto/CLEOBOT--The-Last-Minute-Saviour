@@ -8,14 +8,14 @@ import { TaskPlan, QuickTemplate } from "./types";
 import { templates } from "./data";
 import { HistorySidebar } from "./components/HistorySidebar";
 import { StepCard } from "./components/StepCard";
-import { 
-  Sparkles, 
-  Send, 
-  AlertTriangle, 
-  Zap, 
-  CheckCircle2, 
-  Clock, 
-  ShieldAlert, 
+import {
+  Sparkles,
+  Send,
+  AlertTriangle,
+  Zap,
+  CheckCircle2,
+  Clock,
+  ShieldAlert,
   Keyboard,
   Compass,
   ArrowRight,
@@ -100,7 +100,7 @@ export default function App() {
   const [currentPlan, setCurrentPlan] = useState<TaskPlan | null>(null);
   const [savedPlans, setSavedPlans] = useState<TaskPlan[]>([]);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Tab selector state (either "planner" or "guardian")
   const [activeMainTab, setActiveMainTab] = useState<"planner" | "guardian">("planner");
 
@@ -116,7 +116,7 @@ export default function App() {
 
   // Network online/offline status
   const [isOnline, setIsOnline] = useState(typeof navigator !== "undefined" ? navigator.onLine : true);
-  
+
   // Command input reference for keyboard focus
   const commandInputRef = useRef<HTMLInputElement>(null);
 
@@ -332,13 +332,13 @@ export default function App() {
         setSpeaking(false);
         return;
       }
-      
+
       const utterance = new SpeechSynthesisUtterance(scriptText);
       utterance.rate = 1.1; // speedy, high intensity!
       utterance.pitch = 1.0;
       utterance.onend = () => setSpeaking(false);
       utterance.onerror = () => setSpeaking(false);
-      
+
       setSpeaking(true);
       window.speechSynthesis.speak(utterance);
     } else {
@@ -502,7 +502,7 @@ export default function App() {
       }
 
       const plan: TaskPlan = await response.json();
-      
+
       // Initialize completed state and flags
       plan.actionableSteps = plan.actionableSteps.map(step => ({
         ...step,
@@ -535,7 +535,7 @@ export default function App() {
   const handleExecuteAgentStep = async (stepOrder: number) => {
     if (!currentPlan) return;
 
-    const updatedSteps = currentPlan.actionableSteps.map(step => 
+    const updatedSteps = currentPlan.actionableSteps.map(step =>
       step.stepOrder === stepOrder ? { ...step, executing: true } : step
     );
     setCurrentPlan({ ...currentPlan, actionableSteps: updatedSteps });
@@ -561,15 +561,15 @@ export default function App() {
       }
 
       const data = await response.json();
-      
-      const finalSteps = currentPlan.actionableSteps.map(s => 
+
+      const finalSteps = currentPlan.actionableSteps.map(s =>
         s.stepOrder === stepOrder ? { ...s, executing: false, agentResult: data.output } : s
       );
-      
+
       const updatedPlan = { ...currentPlan, actionableSteps: finalSteps };
       setCurrentPlan(updatedPlan);
 
-      const updatedHistory = savedPlans.map(p => 
+      const updatedHistory = savedPlans.map(p =>
         p.taskName === currentPlan.taskName ? updatedPlan : p
       );
       setSavedPlans(updatedHistory);
@@ -579,7 +579,7 @@ export default function App() {
         localStorage.setItem("last_minute_life_saver_plans", JSON.stringify(updatedHistory));
       }
     } catch (err: any) {
-      const finalSteps = currentPlan.actionableSteps.map(s => 
+      const finalSteps = currentPlan.actionableSteps.map(s =>
         s.stepOrder === stepOrder ? { ...s, executing: false, agentResult: `Execution error: ${err.message}` } : s
       );
       setCurrentPlan({ ...currentPlan, actionableSteps: finalSteps });
@@ -589,14 +589,14 @@ export default function App() {
   const handleToggleStepComplete = async (stepOrder: number) => {
     if (!currentPlan) return;
 
-    const updatedSteps = currentPlan.actionableSteps.map(step => 
+    const updatedSteps = currentPlan.actionableSteps.map(step =>
       step.stepOrder === stepOrder ? { ...step, completed: !step.completed } : step
     );
 
     const updatedPlan = { ...currentPlan, actionableSteps: updatedSteps };
     setCurrentPlan(updatedPlan);
 
-    const updatedHistory = savedPlans.map(p => 
+    const updatedHistory = savedPlans.map(p =>
       p.taskName === currentPlan.taskName ? updatedPlan : p
     );
     setSavedPlans(updatedHistory);
@@ -703,15 +703,15 @@ export default function App() {
   if (!user) {
     if (showLanding) {
       return (
-        <LandingScreen 
-          onGetStarted={() => setShowLanding(false)} 
-          onSignInClick={() => setShowLanding(false)} 
+        <LandingScreen
+          onGetStarted={() => setShowLanding(false)}
+          onSignInClick={() => setShowLanding(false)}
         />
       );
     }
 
     return (
-      <AuthScreen 
+      <AuthScreen
         onAuthSuccess={async (authUser, accessToken) => {
           setUser(authUser);
           setToken(accessToken);
@@ -734,7 +734,7 @@ export default function App() {
 
   return (
     <div id="app-root" className="min-h-screen bg-[#F8F9FA] text-black font-sans flex flex-col pb-36 selection:bg-[#FF4A8D] selection:text-white">
-      
+
       {/* Playful Top Header */}
       <header id="app-header" className="bg-white neo-border border-t-0 border-l-0 border-r-0 px-6 py-5">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
@@ -874,14 +874,14 @@ export default function App() {
 
       {/* Main Workspace Layout */}
       <main id="app-workspace" className="max-w-7xl w-full mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1">
-        
+
         {/* Left hand side: Playful Sidebar (4 columns) */}
         <div className="lg:col-span-4 flex flex-col gap-6">
-          
 
 
-          <HistorySidebar 
-            plans={savedPlans} 
+
+          <HistorySidebar
+            plans={savedPlans}
             selectedPlan={currentPlan}
             onSelectPlan={handleSelectPlan}
             onDeletePlan={handleDeletePlan}
@@ -893,14 +893,14 @@ export default function App() {
 
           {/* 1. THE MEET CLEO CONVERSATIONAL WORKSPACE */}
           <section id="cleo-chat-workspace" className="bg-[#FFFEEF] neo-border p-6 neo-shadow-lg relative overflow-hidden">
-            
+
             {/* Playful Stickers in background */}
             <div className="absolute right-4 top-4 rotate-[12deg] bg-[#FF4A8D] text-black text-[10px] font-mono font-black px-2.5 py-1 neo-border-sm uppercase select-none pointer-events-none">
               CLEO CONCIERGE
             </div>
 
             <div className="flex items-start gap-4">
-              
+
               {/* Illustrative Cleo Avatar sticker */}
               <div className="flex-shrink-0 flex flex-col items-center">
                 <div className="w-14 h-14 bg-white rounded-full neo-border flex items-center justify-center relative neo-shadow overflow-hidden p-1">
@@ -917,7 +917,7 @@ export default function App() {
               {/* Cleo Prominent Speech Bubble */}
               <div className="flex-1 min-w-0">
                 <div className="relative bg-white p-5 neo-border neo-shadow text-black rounded-none">
-                  
+
                   {/* Arrow bubble decorator */}
                   <div className="absolute left-[-11px] top-4 w-0 h-0 border-y-8 border-y-transparent border-r-8 border-r-black" />
                   <div className="absolute left-[-8px] top-4 w-0 h-0 border-y-[7px] border-y-transparent border-r-[7px] border-r-white" />
@@ -926,7 +926,7 @@ export default function App() {
                     <TrendingUp className="w-4 h-4 text-[#FF4A8D]" />
                     AI MENTOR & PROCRASTINATION DISRUPTOR
                   </h3>
-                  
+
                   <p className="font-display font-black text-sm md:text-base text-black tracking-tight leading-relaxed">
                     "{getCleoSpeechText()}"
                   </p>
@@ -940,22 +940,20 @@ export default function App() {
           <div id="main-tab-switcher" className="flex gap-4 border-b-2 border-black pb-4 mb-4">
             <button
               onClick={() => setActiveMainTab("planner")}
-              className={`px-5 py-2.5 font-display font-black text-xs uppercase tracking-wider neo-border transition-all cursor-pointer flex items-center gap-2 ${
-                activeMainTab === "planner"
+              className={`px-5 py-2.5 font-display font-black text-xs uppercase tracking-wider neo-border transition-all cursor-pointer flex items-center gap-2 ${activeMainTab === "planner"
                   ? "bg-[#FF4A8D] text-black neo-shadow-sm translate-x-[-1px] translate-y-[-1px]"
                   : "bg-white text-zinc-600 hover:text-black hover:bg-[#FFFEEF]"
-              }`}
+                }`}
             >
               <Zap className="w-4 h-4 text-black stroke-[2.5]" />
               <span>Crisis Game Planner</span>
             </button>
             <button
               onClick={() => setActiveMainTab("guardian")}
-              className={`px-5 py-2.5 font-display font-black text-xs uppercase tracking-wider neo-border transition-all cursor-pointer flex items-center gap-2 ${
-                activeMainTab === "guardian"
+              className={`px-5 py-2.5 font-display font-black text-xs uppercase tracking-wider neo-border transition-all cursor-pointer flex items-center gap-2 ${activeMainTab === "guardian"
                   ? "bg-[#7C3AED] text-white neo-shadow-sm translate-x-[-1px] translate-y-[-1px]"
                   : "bg-white text-zinc-600 hover:text-black hover:bg-[#FFFEEF]"
-              }`}
+                }`}
             >
               <Shield className="w-4 h-4 stroke-[2.5]" />
               <span>Proactive Guardian Engine</span>
@@ -994,11 +992,10 @@ export default function App() {
                       setSelectedMode("A");
                       setGuardianInput(GUARDIAN_PRESETS[0].input);
                     }}
-                    className={`text-left border-2 border-black p-4 transition-all neo-shadow cursor-pointer ${
-                      selectedMode === "A"
+                    className={`text-left border-2 border-black p-4 transition-all neo-shadow cursor-pointer ${selectedMode === "A"
                         ? "bg-[#FFFEEF] ring-2 ring-black -translate-x-[2px] -translate-y-[2px] shadow-[4px_4px_0px_0px_#7C3AED]"
                         : "bg-[#F8F9FA] hover:bg-[#FFFEEF]/50"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <h4 className="font-display font-black text-xs text-[#7C3AED] uppercase">
@@ -1017,11 +1014,10 @@ export default function App() {
                       setSelectedMode("B");
                       setGuardianInput(GUARDIAN_PRESETS[1].input);
                     }}
-                    className={`text-left border-2 border-black p-4 transition-all neo-shadow cursor-pointer ${
-                      selectedMode === "B"
+                    className={`text-left border-2 border-black p-4 transition-all neo-shadow cursor-pointer ${selectedMode === "B"
                         ? "bg-[#FFFEEF] ring-2 ring-black -translate-x-[2px] -translate-y-[2px] shadow-[4px_4px_0px_0px_#10B981]"
                         : "bg-[#F8F9FA] hover:bg-[#FFFEEF]/50"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <h4 className="font-display font-black text-xs text-[#10B981] uppercase">
@@ -1040,11 +1036,10 @@ export default function App() {
                       setSelectedMode("C");
                       setGuardianInput(GUARDIAN_PRESETS[2].input);
                     }}
-                    className={`text-left border-2 border-black p-4 transition-all neo-shadow cursor-pointer ${
-                      selectedMode === "C"
+                    className={`text-left border-2 border-black p-4 transition-all neo-shadow cursor-pointer ${selectedMode === "C"
                         ? "bg-[#FFFEEF] ring-2 ring-black -translate-x-[2px] -translate-y-[2px] shadow-[4px_4px_0px_0px_#EF4444]"
                         : "bg-[#F8F9FA] hover:bg-[#FFFEEF]/50"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <h4 className="font-display font-black text-xs text-[#EF4444] uppercase">
@@ -1158,8 +1153,8 @@ Evaluate system state and generate a protective escalation backup call or delay-
                       selectedMode === "A"
                         ? "Paste unread email messages or click Pull Unread Emails to scan commitments..."
                         : selectedMode === "B"
-                        ? "Paste calendar schedules and deadline items to compute defense focus times..."
-                        : "Paste impending disaster parameters or load the active plan status to construct buffer templates..."
+                          ? "Paste calendar schedules and deadline items to compute defense focus times..."
+                          : "Paste impending disaster parameters or load the active plan status to construct buffer templates..."
                     }
                     className="w-full bg-white border-2 border-black p-3 font-mono text-xs text-black focus:outline-none focus:ring-0 focus:border-[#7C3AED]"
                   />
@@ -1211,23 +1206,22 @@ Evaluate system state and generate a protective escalation backup call or delay-
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
-                      
+
                       {/* Left Block: Operational Mode, Panic Status, & Escalate Phone script (5 Columns) */}
                       <div className="md:col-span-5 space-y-4">
-                        
+
                         {/* Mode Card */}
                         <div className="border-2 border-black p-4 bg-[#FFFEEF] neo-shadow-sm">
                           <span className="text-[10px] text-zinc-500 font-mono font-black uppercase tracking-wider block">
                             CORE MODE DETECTED
                           </span>
                           <div className="flex items-center gap-2 mt-2">
-                            <span className={`text-sm px-3 py-1 font-display font-black border-2 border-black uppercase tracking-wider ${
-                              guardianResult.modeDetected === "HARVEST"
+                            <span className={`text-sm px-3 py-1 font-display font-black border-2 border-black uppercase tracking-wider ${guardianResult.modeDetected === "HARVEST"
                                 ? "bg-[#7C3AED] text-white"
                                 : guardianResult.modeDetected === "BLOCK_BUFFER"
-                                ? "bg-[#10B981] text-black"
-                                : "bg-[#EF4444] text-white animate-pulse"
-                            }`}>
+                                  ? "bg-[#10B981] text-black"
+                                  : "bg-[#EF4444] text-white animate-pulse"
+                              }`}>
                               MODE {guardianResult.modeDetected === "HARVEST" ? "A" : guardianResult.modeDetected === "BLOCK_BUFFER" ? "B" : "C"}: {guardianResult.modeDetected}
                             </span>
                           </div>
@@ -1235,8 +1229,8 @@ Evaluate system state and generate a protective escalation backup call or delay-
                             {guardianResult.modeDetected === "HARVEST"
                               ? "Scanned inbox snippets to harvest missed financial and contract deadlines."
                               : guardianResult.modeDetected === "BLOCK_BUFFER"
-                              ? "Computed empty calendar intervals and structured focused research buffers."
-                              : "Detected imminent project submission failure. Escalating delay template."}
+                                ? "Computed empty calendar intervals and structured focused research buffers."
+                                : "Detected imminent project submission failure. Escalating delay template."}
                           </p>
                         </div>
 
@@ -1274,11 +1268,10 @@ Evaluate system state and generate a protective escalation backup call or delay-
                             <button
                               type="button"
                               onClick={() => handleSimulateCall(guardianResult.escalationTwiMLScript)}
-                              className={`w-full flex items-center justify-center gap-2 text-xs font-black uppercase py-2.5 transition-all neo-border-sm cursor-pointer ${
-                                speaking
+                              className={`w-full flex items-center justify-center gap-2 text-xs font-black uppercase py-2.5 transition-all neo-border-sm cursor-pointer ${speaking
                                   ? "bg-[#EF4444] text-white animate-pulse"
                                   : "bg-[#FF4A8D] text-black hover:bg-pink-400"
-                              }`}
+                                }`}
                             >
                               {speaking ? (
                                 <>
@@ -1299,7 +1292,7 @@ Evaluate system state and generate a protective escalation backup call or delay-
 
                       {/* Right Block: Discovered Deadlines & Focus Blocks lists (7 Columns) */}
                       <div className="md:col-span-7 space-y-4">
-                        
+
                         {/* Discovered Deadlines */}
                         <div className="border-2 border-black p-5 bg-white neo-shadow-sm space-y-3">
                           <h5 className="font-display font-black text-xs uppercase text-black border-b-2 border-black pb-1.5 flex items-center gap-2">
@@ -1313,13 +1306,12 @@ Evaluate system state and generate a protective escalation backup call or delay-
                                   <span className="font-display font-extrabold text-xs text-black">
                                     {d.title}
                                   </span>
-                                  <span className={`text-[9px] font-mono font-black px-1.5 py-0.5 border-2 border-black uppercase ${
-                                    d.urgencyScore === "Critical"
+                                  <span className={`text-[9px] font-mono font-black px-1.5 py-0.5 border-2 border-black uppercase ${d.urgencyScore === "Critical"
                                       ? "bg-[#EF4444] text-white"
                                       : d.urgencyScore === "High"
-                                      ? "bg-[#FFBB00] text-black"
-                                      : "bg-[#10B981] text-black"
-                                  }`}>
+                                        ? "bg-[#FFBB00] text-black"
+                                        : "bg-[#10B981] text-black"
+                                    }`}>
                                     {d.urgencyScore}
                                   </span>
                                 </div>
@@ -1377,8 +1369,8 @@ Evaluate system state and generate a protective escalation backup call or delay-
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-72 overflow-y-auto pr-2">
                       {scansHistory.map((scan) => (
-                        <div 
-                          key={scan.id} 
+                        <div
+                          key={scan.id}
                           onClick={() => {
                             setGuardianInput(scan.rawInput || "");
                             setGuardianResult(scan.result);
@@ -1386,20 +1378,19 @@ Evaluate system state and generate a protective escalation backup call or delay-
                           className="bg-[#F8F9FA] hover:bg-[#FFFEEF] border border-black p-3.5 transition-all text-left cursor-pointer neo-shadow-sm hover:translate-x-[-1px] hover:translate-y-[-1px] group"
                         >
                           <div className="flex items-center justify-between gap-2 border-b border-black/10 pb-1.5 mb-2">
-                            <span className={`text-[9px] font-mono font-black px-1.5 py-0.5 border border-black uppercase ${
-                              scan.result.modeDetected === "HARVEST"
+                            <span className={`text-[9px] font-mono font-black px-1.5 py-0.5 border border-black uppercase ${scan.result.modeDetected === "HARVEST"
                                 ? "bg-[#7C3AED] text-white"
                                 : scan.result.modeDetected === "BLOCK_BUFFER"
-                                ? "bg-[#10B981] text-black"
-                                : "bg-[#EF4444] text-white"
-                            }`}>
+                                  ? "bg-[#10B981] text-black"
+                                  : "bg-[#EF4444] text-white"
+                              }`}>
                               {scan.result.modeDetected}
                             </span>
                             <span className="text-[8px] font-mono text-zinc-500 font-bold">
                               {scan.scannedAt ? new Date(scan.scannedAt).toLocaleString() : "Recently"}
                             </span>
                           </div>
-                          
+
                           <p className="text-[10px] text-zinc-600 font-bold uppercase truncate group-hover:text-black">
                             INPUT FEED: {scan.rawInput}
                           </p>
@@ -1442,7 +1433,7 @@ Evaluate system state and generate a protective escalation backup call or delay-
                       FAST TASK GAME PLANNER
                     </span>
                   </div>
-                  
+
                   <div className="space-y-1.5">
                     <label className="text-[9px] font-mono font-bold text-zinc-500 uppercase block">
                       ENTER YOUR PANIC DELIVERABLE:
@@ -1467,7 +1458,7 @@ Evaluate system state and generate a protective escalation backup call or delay-
                         className="bg-transparent border-none text-xs text-black font-extrabold focus:outline-none focus:ring-0 uppercase w-20 placeholder-zinc-400"
                       />
                     </div>
-                    
+
                     <button
                       type="submit"
                       disabled={loading || !taskInput.trim()}
@@ -1521,16 +1512,16 @@ Evaluate system state and generate a protective escalation backup call or delay-
                 exit={{ opacity: 0, y: -15 }}
                 className="space-y-6"
               >
-                
+
                 {/* 1. THE HIGHEST PRIORITY HEADER FOCUS CARD */}
                 <div className="bg-white neo-border p-6 neo-shadow-lg relative overflow-hidden">
-                  
+
                   {/* Decorative corner stripe */}
                   <div className="absolute top-0 right-0 w-32 h-32 bg-[#FF4A8D] translate-x-12 -translate-y-12 rotate-[45deg] pointer-events-none border-b-4 border-black" />
 
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
                     <div className="space-y-3 flex-1">
-                      
+
                       <div className="flex justify-between items-center flex-wrap gap-2 mr-6">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-[10px] font-mono font-black uppercase bg-[#EF4444] text-white px-2.5 py-0.5 neo-border-sm">
@@ -1588,7 +1579,7 @@ Evaluate system state and generate a protective escalation backup call or delay-
 
                 {/* Progress & Escalation Tactics Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
-                  
+
                   {/* Completion Bento Badge (4 Cols) */}
                   <div className="bg-white p-5 neo-border neo-shadow md:col-span-5 flex flex-col justify-between">
                     <div>
@@ -1680,7 +1671,7 @@ Evaluate system state and generate a protective escalation backup call or delay-
                         onToggleComplete={handleToggleStepComplete}
                         onExecuteAgent={handleExecuteAgentStep}
                         onUpdateAgentResult={(stepOrder, result) => {
-                          const updated = currentPlan.actionableSteps.map(s => 
+                          const updated = currentPlan.actionableSteps.map(s =>
                             s.stepOrder === stepOrder ? { ...s, agentResult: result } : s
                           );
                           setCurrentPlan({ ...currentPlan, actionableSteps: updated });
@@ -1709,7 +1700,7 @@ Evaluate system state and generate a protective escalation backup call or delay-
 
       {/* 3. THE FLOATING RETRO-POP COMMAND BAR */}
       <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl px-4">
-        <form 
+        <form
           onSubmit={handleAnalyzeTask}
           className="bg-[#FFFEEF] neo-border shadow-lg p-3 md:p-4.5 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 relative transition-all focus-within:shadow-[6px_6px_0px_0px_#FF4A8D]"
         >
@@ -1718,7 +1709,7 @@ Evaluate system state and generate a protective escalation backup call or delay-
             <div className="bg-[#FF4A8D] p-1.5 neo-border-sm text-black hidden sm:block rotate-[-5deg]">
               <Zap className="w-5 h-5 stroke-[2.5]" />
             </div>
-            
+
             <input
               ref={commandInputRef}
               type="text"
@@ -1732,7 +1723,7 @@ Evaluate system state and generate a protective escalation backup call or delay-
 
           {/* Speed settings panel and Submit */}
           <div className="flex items-center gap-3 self-stretch sm:self-auto justify-between border-t sm:border-t-0 border-black/10 pt-2 sm:pt-0">
-            
+
             <div className="flex items-center gap-1.5 bg-white neo-border-sm px-2.5 py-1">
               <span className="text-[10px] font-mono font-black uppercase text-zinc-500">DUE:</span>
               <input
