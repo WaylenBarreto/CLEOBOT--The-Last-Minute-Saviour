@@ -832,6 +832,7 @@ export default function App() {
                   setActiveMainTab("guardian");
                   setSelectedMode("A");
                   setGuardianInput(GUARDIAN_PRESETS[0].input);
+                  setTimeout(() => document.getElementById("main-tab-switcher")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
                 }}
                 className="bg-[#FFBB00] hover:bg-amber-400 text-black px-3.5 py-2 text-[10px] font-display font-black border-2 border-black neo-shadow-sm transition-all cursor-pointer uppercase flex items-center gap-2 hover:-translate-x-[1px] hover:-translate-y-[1px]"
               >
@@ -845,6 +846,7 @@ export default function App() {
                   setActiveMainTab("guardian");
                   setSelectedMode("B");
                   setGuardianInput(GUARDIAN_PRESETS[1].input);
+                  setTimeout(() => document.getElementById("main-tab-switcher")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
                 }}
                 className="bg-[#10B981] hover:bg-emerald-600 text-black px-3.5 py-2 text-[10px] font-display font-black border-2 border-black neo-shadow-sm transition-all cursor-pointer uppercase flex items-center gap-2 hover:-translate-x-[1px] hover:-translate-y-[1px]"
               >
@@ -858,6 +860,7 @@ export default function App() {
                   setActiveMainTab("guardian");
                   setSelectedMode("C");
                   setGuardianInput(GUARDIAN_PRESETS[2].input);
+                  setTimeout(() => document.getElementById("main-tab-switcher")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
                 }}
                 className="bg-[#EF4444] hover:bg-red-600 text-white px-3.5 py-2 text-[10px] font-display font-black border-2 border-black neo-shadow-sm transition-all cursor-pointer uppercase flex items-center gap-1.5 hover:-translate-x-[1px] hover:-translate-y-[1px]"
               >
@@ -934,7 +937,7 @@ export default function App() {
           </section>
 
           {/* 2. TAB SWITCHER */}
-          <div className="flex gap-4 border-b-2 border-black pb-4 mb-4">
+          <div id="main-tab-switcher" className="flex gap-4 border-b-2 border-black pb-4 mb-4">
             <button
               onClick={() => setActiveMainTab("planner")}
               className={`px-5 py-2.5 font-display font-black text-xs uppercase tracking-wider neo-border transition-all cursor-pointer flex items-center gap-2 ${
